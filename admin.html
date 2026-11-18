@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Showrov store - Admin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%237c4dbd%22/><text x=%2250%22 y=%2272%22 font-size=%2266%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Arial%22 font-weight=%22bold%22>S</text></svg>">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,sans-serif;background:#f6f2fc;color:#1d1530;font-size:16px}
+.w{max-width:760px;margin:0 auto;padding:14px}
+h1{color:#7c4dbd;font-size:22px;margin:6px 0 12px}
+input{width:100%;padding:12px;margin:6px 0;border:1px solid #d9cdee;border-radius:10px;font-size:16px}
+button,.btn{background:#7c4dbd;color:#fff;border:0;border-radius:10px;padding:10px 14px;font-size:15px;cursor:pointer;margin:6px 6px 0 0;text-decoration:none;display:inline-flex;align-items:center;min-height:44px}
+button.o,.btn.o{background:#fff;color:#7c4dbd;border:1px solid #7c4dbd}
+button.on{outline:3px solid #1d1530}
+button:disabled{opacity:.45;cursor:default}
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0}
+.st{background:#fff;border:1px solid #e4daf3;border-radius:14px;padding:12px;text-align:center}
+.st b{display:block;font-size:22px;color:#7c4dbd}
+.st span{font-size:13px;color:#6b6280}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button{margin:0;background:#fff;color:#1d1530;border:1px solid #d9cdee;border-radius:20px;padding:6px 14px}
+.tabs button.sel{background:#7c4dbd;color:#fff;border-color:#7c4dbd}
+.c{background:#fff;border-radius:14px;padding:14px;margin:12px 0;border:1px solid #e4daf3;line-height:1.6;overflow-wrap:anywhere}
+.new{border-left:6px solid #e8590c}.confirmed{border-left:6px solid #1c7ed6}.delivered{border-left:6px solid #2f9e44}.cancelled{border-left:6px solid #868e96;opacity:.75}
+.c table{width:100%;border-collapse:collapse;margin:6px 0;font-size:15px}
+.c td{padding:3px 0;border-bottom:1px dashed #e4daf3}
+.c td:last-child{text-align:right;white-space:nowrap}
+.muted{color:#6b6280;font-size:14px}
+#err{color:#d6336c}
+#alert{display:none;position:sticky;top:0;z-index:3;background:#e8590c;color:#fff;padding:10px 14px;border-radius:10px;font-weight:700;text-align:center;cursor:pointer}
+select,textarea{width:100%;padding:12px;margin:6px 0;border:1px solid #d9cdee;border-radius:10px;font-size:16px;background:#fff}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media print{.noprint,button,.btn,#login{display:none!important}body{background:#fff}.c{break-inside:avoid;opacity:1}}
+</style></head>
+<body><div class="w">
+<div id="alert" onclick="this.style.display='none'"></div>
+<div class="top"><h1>🛒 Showrov store - অর্ডার</h1><span id="who" class="muted"></span></div>
+<div id="login">
+<input id="em" type="email" placeholder="অ্যাডমিন ইমেইল" autocomplete="username">
+<input id="pw" type="password" placeholder="পাসওয়ার্ড" autocomplete="current-password">
+<button id="in">লগইন</button>
+</div>
+<div id="app" style="display:none">
+<div class="noprint">
+<button class="o" id="out">লগআউট</button><button class="o" id="ntf">🔔 নতুন অর্ডারের নোটিফিকেশন চালু করুন</button><button class="o" onclick="print()">🖨️ প্রিন্ট</button>
+<div class="tabs" style="margin:10px 0"><button class="sel" id="vo">🧾 অর্ডার</button><button id="vp">📦 পণ্য / স্টক</button></div></div><div id="ordv"><div class="noprint"><div class="stats">
+<div class="st"><b id="sNew">০</b><span>নতুন অর্ডার</span></div>
+<div class="st"><b id="sToday">০</b><span>আজকের অর্ডার</span></div>
+<div class="st"><b id="sSale">৳০</b><span>আজকের বিক্রি (বাতিল বাদে)</span></div>
+</div>
+<input id="q" type="search" placeholder="🔍 নাম, ফোন বা অর্ডার নম্বর দিয়ে খুঁজুন">
+<div class="tabs" id="tabs"></div>
+</div>
+<div id="list"></div></div><div id="pv" style="display:none"></div>
+</div>
+<p id="err"></p>
+</div>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import{getFirestore,collection,query,orderBy,onSnapshot,doc,updateDoc,addDoc,setDoc,deleteDoc,increment}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const app=initializeApp({apiKey:"AIzaSyCKK3M-58_-ivMk2Z-gW7mMDRQf_sAIBJs",authDomain:"showrov-store-4c0da.firebaseapp.com",projectId:"showrov-store-4c0da",appId:"1:264853187583:web:bbc27d496a4c45fb3195ca"});
+const auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);
+const esc=s=>{const d=document.createElement("div");d.textContent=s==null?"":s;return d.innerHTML};
+const bnum=n=>String(n).replace(/\d/g,d=>"০১২৩৪৫৬৭৮৯"[d]);
+const LB={new:"🆕 নতুন",confirmed:"✅ নিশ্চিত",delivered:"📦 ডেলিভারি হয়েছে",cancelled:"❌ বাতিল"};
+const TABS=[["all","সব"],["new","🆕 নতুন"],["confirmed","✅ নিশ্চিত"],["delivered","📦 ডেলিভারি"],["cancelled","❌ বাতিল"]];
+let unsubP=null,prods=[],unsub=null,orders=[],F="all",Q="",seen=null;
+
+$("in").onclick=()=>signInWithEmailAndPassword(auth,$("em").value.trim(),$("pw").value).catch(()=>{$("err").textContent="ইমেইল বা পাসওয়ার্ড ভুল"});
+$("pw").onkeydown=e=>{if(e.key==="Enter")$("in").click()};
+$("out").onclick=()=>signOut(auth);
+$("q").oninput=e=>{Q=e.target.value.trim().toLowerCase();draw()};
+$("tabs").onclick=e=>{const b=e.target.closest("button[data-f]");if(b){F=b.dataset.f;draw()}};
+
+function ntfLabel(){if(!("Notification"in window)){$("ntf").style.display="none";return}
+if(Notification.permission==="granted"){$("ntf").textContent="🔔 নোটিফিকেশন চালু আছে";$("ntf").disabled=true}}
+$("ntf").onclick=()=>{if("Notification"in window)Notification.requestPermission().then(ntfLabel)};
+ntfLabel();
+
+function beep(){try{const a=new(window.AudioContext||window.webkitAudioContext)();[0,.25].forEach(t=>{const o=a.createOscillator(),g=a.createGain();o.frequency.value=880;o.connect(g);g.connect(a.destination);g.gain.setValueAtTime(.25,a.currentTime+t);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+t+.2);o.start(a.currentTime+t);o.stop(a.currentTime+t+.2)})}catch(e){}}
+function alertNew(list){
+const msg=list.length===1?`নতুন অর্ডার ${list[0].no||""} · ${list[0].name||""} · ৳${list[0].total||0}`:`${bnum(list.length)}টি নতুন অর্ডার এসেছে`;
+$("alert").textContent="🔔 "+msg;$("alert").style.display="block";beep();
+try{if(Notification.permission==="granted")new Notification("Showrov store",{body:msg})}catch(e){}}
+
+function waLink(p){let n=String(p||"").replace(/\D/g,"");if(n.startsWith("0"))n="88"+n;return"https://wa.me/"+n}
+
+function draw(){
+const today=new Date().toDateString();let nNew=0,nToday=0,sale=0;const cnt={all:orders.length};
+orders.forEach(o=>{cnt[o.status]=(cnt[o.status]||0)+1;if(o.status==="new")nNew++;
+if(o.t&&o.t.toDateString()===today){nToday++;if(o.status!=="cancelled")sale+=Number(o.total)||0}});
+$("sNew").textContent=bnum(nNew);$("sToday").textContent=bnum(nToday);$("sSale").textContent="৳"+bnum(sale);
+$("tabs").innerHTML=TABS.map(([k,l])=>`<button data-f="${k}" class="${F===k?"sel":""}">${l} (${bnum(cnt[k]||0)})</button>`).join("");
+let h="";
+orders.forEach(o=>{
+if(F!=="all"&&o.status!==F)return;
+if(Q&&!`${o.no} ${o.name} ${o.phone} ${o.address}`.toLowerCase().includes(Q))return;
+const rows=(o.items||[]).map(i=>`<tr><td>${esc(i.bn||i.name)} × ${esc(i.qty)}</td><td>৳${esc((Number(i.price)||0)*(Number(i.qty)||0))}</td></tr>`).join("");
+const t=o.t?o.t.toLocaleString("bn-BD"):"";
+const sb=(s,l,c="")=>`<button class="${c}${o.status===s?" on":""}" data-i="${o.id}" data-s="${s}" ${o.status===s?"disabled":""}>${l}</button>`;
+h+=`<div class="c ${esc(o.status)}"><b>${esc(o.no)}</b> · ${LB[o.status]||esc(o.status)}<br><span class="muted">${esc(t)}</span><br>
+👤 ${esc(o.name)} · <a href="tel:${esc(o.phone)}">${esc(o.phone)}</a><br>📍 ${esc(o.address)}
+<table>${rows}<tr><td><b>মোট (ক্যাশ অন ডেলিভারি)</b></td><td><b>৳${esc(o.total)}</b></td></tr></table>
+<a class="btn o" href="tel:${esc(o.phone)}">📞 কল</a><a class="btn o" target="_blank" rel="noopener" href="${waLink(o.phone)}">💬 WhatsApp</a><br>
+${sb("confirmed","নিশ্চিত")}${sb("delivered","ডেলিভারি হয়েছে")}${sb("cancelled","বাতিল","o")}</div>`});
+$("list").innerHTML=h||"<p>এখানে কোনো অর্ডার নেই</p>";
+document.title=(nNew?"("+nNew+") ":"")+"Showrov store - Admin"}
+
+onAuthStateChanged(auth,u=>{
+if(unsub){unsub();unsub=null}if(unsubP){unsubP();unsubP=null}seen=null;orders=[];prods=[];
+$("login").style.display=u?"none":"block";$("app").style.display=u?"block":"none";$("err").textContent="";$("who").textContent=u?u.email:"";
+if(!u)return;
+unsubP=onSnapshot(collection(db,"products"),r=>{prods=[];r.forEach(d=>prods.push({...d.data(),id:d.id}));prods.sort((a,b)=>(a.ord||0)-(b.ord||0));drawP()},()=>{});
+unsub=onSnapshot(query(collection(db,"orders"),orderBy("createdAt","desc")),s=>{
+orders=[];s.forEach(d=>{const o=d.data();orders.push({...o,id:d.id,t:o.createdAt?o.createdAt.toDate():null})});
+const ids=new Set(orders.map(o=>o.id));
+if(seen){const fresh=orders.filter(o=>!seen.has(o.id)&&o.status==="new");if(fresh.length)alertNew(fresh)}
+seen=ids;draw()},
+()=>{$("err").textContent="এই অ্যাকাউন্টে অর্ডার দেখার অনুমতি নেই (অ্যাডমিন UID নিয়মে বসানো হয়েছে কি?)"})});
+
+$("list").onclick=e=>{const b=e.target.closest("button[data-i]");if(!b)return;
+if(b.dataset.s==="cancelled"&&!confirm("এই অর্ডারটি বাতিল করবেন?"))return;
+const o=orders.find(x=>x.id===b.dataset.i),s=b.dataset.s,ch={status:s};
+const mv=k=>(o.items||[]).forEach(i=>{const p=prods.find(x=>x.id===i.id);if(p&&p.stock!=null&&p.stock!=="")updateDoc(doc(db,"products",i.id),{stock:increment(k*i.qty)}).catch(()=>{})});
+if((s==="confirmed"||s==="delivered")&&!o.stockCut){mv(-1);ch.stockCut=true}
+if(s==="cancelled"&&o.stockCut){mv(1);ch.stockCut=false}
+updateDoc(doc(db,"orders",b.dataset.i),ch).catch(()=>{$("err").textContent="আপডেট হয়নি"})};
+
+
+const CATS={g:"মুদি",v:"শাক-সবজি",h:"ঘরের সামগ্রী"};
+function setV(v){$("ordv").style.display=v==="o"?"":"none";$("pv").style.display=v==="p"?"":"none";$("vo").className=v==="o"?"sel":"";$("vp").className=v==="p"?"sel":""}
+$("vo").onclick=()=>setV("o");$("vp").onclick=()=>setV("p");
+const rs=f=>new Promise((ok,no)=>{const i=new Image,u=URL.createObjectURL(f);i.onload=()=>{const k=Math.min(1,420/Math.max(i.width,i.height)),c=document.createElement("canvas");c.width=i.width*k;c.height=i.height*k;c.getContext("2d").drawImage(i,0,0,c.width,c.height);URL.revokeObjectURL(u);ok(c.toDataURL("image/jpeg",.7))};i.onerror=no;i.src=u});
+const fi=document.createElement("input");fi.type="file";fi.accept="image/*";
+fi.onchange=async()=>{if(fi.files[0])updateDoc(doc(db,"products",fi.dataset.id),{img:await rs(fi.files[0])}).catch(()=>{$("err").textContent="ছবি সেভ হয়নি"});fi.value=""};
+$("pv").innerHTML=`<div class="c"><b>➕ নতুন পণ্য যোগ করুন</b>
+<input id="nb" placeholder="পণ্যের নাম (বাংলা) *"><input id="ne" placeholder="English name (ঐচ্ছিক)">
+<select id="nc"><option value="g">মুদি</option><option value="v">শাক-সবজি</option><option value="h">ঘরের সামগ্রী</option></select>
+<input id="np" type="number" inputmode="numeric" placeholder="দাম (৳) *"><input id="nd" type="number" inputmode="numeric" placeholder="ছাড় % (ঐচ্ছিক)"><input id="ns" type="number" inputmode="numeric" placeholder="স্টক সংখ্যা (খালি = সীমাহীন)">
+<input id="nm" placeholder="ইমোজি (ছবি না দিলে)" value="🛒"><span class="muted">পণ্যের ছবি:</span><input id="nf" type="file" accept="image/*"><button id="na">পণ্য যোগ করুন</button></div><div id="pl"></div>`;
+function drawP(){let h="";
+if(!prods.length)h+=`<div class="c">এখনো কোনো পণ্য নেই। <button id="seed">আগের ১২টি পণ্য আমদানি করুন</button></div>`;
+prods.forEach(p=>{const no=p.stock!=null&&p.stock!==""&&Number(p.stock)<=0,im=p.img?`<img src="${esc(p.img)}" alt="" style="width:56px;height:56px;object-fit:cover;border-radius:10px;vertical-align:middle">`:`<span style="font-size:34px">${esc(p.e||"🛒")}</span>`;
+h+=`<div class="c" data-p="${esc(p.id)}">${im} <b>${esc(p.bn)}</b><br><span class="muted">${CATS[p.c]||""} · ${p.active===false?"🙈 লুকানো":"চালু"}${no?" · ⚠️ স্টক শেষ":""}</span><br>
+দাম <input data-f="p" type="number" value="${esc(p.p)}" style="width:90px"> ছাড়% <input data-f="d" type="number" value="${esc(p.d||0)}" style="width:80px"> স্টক <input data-f="stock" type="number" value="${p.stock==null?"":esc(p.stock)}" placeholder="∞" style="width:90px"><br>
+<button data-a="save">💾 সেভ</button><button class="o" data-a="img">🖼️ ছবি বদলান</button><button class="o" data-a="hide">${p.active===false?"চালু করুন":"লুকান"}</button><button class="o" data-a="del">🗑️ মুছুন</button></div>`});
+$("pl").innerHTML=h}
+$("pv").onclick=async e=>{const b=e.target.closest("button");if(!b)return;
+if(b.id==="na"){const n=$("nb").value.trim(),pr=Number($("np").value),st=$("ns").value;if(!n||!(pr>0)){$("err").textContent="নাম ও দাম দিন";return}
+b.disabled=true;try{const f=$("nf").files[0];await addDoc(collection(db,"products"),{bn:n,en:$("ne").value.trim()||n,c:$("nc").value,e:$("nm").value||"🛒",p:pr,d:Math.min(90,Number($("nd").value)||0),stock:st===""?null:Number(st),active:true,ord:-Date.now(),img:f?await rs(f):""});["nb","ne","np","nd","ns","nf"].forEach(i=>$(i).value="");$("err").textContent=""}catch(x){$("err").textContent="পণ্য যোগ হয়নি (Firestore নিয়মে products অনুমতি দিয়েছেন?)"}b.disabled=false;return}
+if(b.id==="seed"){const D=[["g","🍚","মিনিকেট চাল (১ কেজি)","Miniket Rice (1 kg)",75],["g","🫘","মসুর ডাল (১ কেজি)","Lentils (1 kg)",130],["g","🛢️","সয়াবিন তেল (১ লিটার)","Soybean Oil (1 L)",175],["g","🥚","ডিম (হালি)","Eggs (4 pcs)",52],["g","🧂","লবণ (১ কেজি)","Salt (1 kg)",40],["g","🍬","চিনি (১ কেজি)","Sugar (1 kg)",130],["g","🥛","দুধ (১ লিটার)","Milk (1 L)",90],["v","🥔","আলু (১ কেজি)","Potato (1 kg)",40],["v","🧅","পেঁয়াজ (১ কেজি)","Onion (1 kg)",70],["v","🍅","টমেটো (১ কেজি)","Tomato (1 kg)",60],["h","🧼","সাবান","Soap",40],["h","🧺","ডিটারজেন্ট (১ কেজি)","Detergent (1 kg)",150]];
+try{await Promise.all(D.map((d,i)=>setDoc(doc(db,"products","p"+(i+1)),{c:d[0],e:d[1],bn:d[2],en:d[3],p:d[4],d:0,stock:null,active:true,ord:i,img:""})))}catch(x){$("err").textContent="আমদানি হয়নি (নিয়ম দেখুন)"}return}
+const row=b.closest("[data-p]");if(!row)return;const id=row.dataset.p,a=b.dataset.a,p=prods.find(x=>x.id===id),g=k=>row.querySelector(`[data-f=${k}]`).value;
+if(a==="save"){const st=g("stock");updateDoc(doc(db,"products",id),{p:Number(g("p"))||0,d:Math.min(90,Number(g("d"))||0),stock:st===""?null:Number(st)}).then(()=>{b.textContent="✅ সেভ হয়েছে"}).catch(()=>{$("err").textContent="সেভ হয়নি"})}
+if(a==="hide")updateDoc(doc(db,"products",id),{active:p.active===false});
+if(a==="del"&&confirm("পণ্যটি মুছে ফেলবেন?"))deleteDoc(doc(db,"products",id));
+if(a==="img"){fi.dataset.id=id;fi.click()}};
+</script>
+</body></html>
