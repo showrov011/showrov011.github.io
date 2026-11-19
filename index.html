@@ -76,6 +76,11 @@ footer a{color:var(--brand2);font-weight:600;text-decoration:none}
 .pc .em{position:relative;overflow:hidden}.pi{width:100%;height:96px;object-fit:cover;border-radius:10px;display:block}
 .bdg{position:absolute;top:4px;left:4px;background:#e8590c;color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:2px 7px}
 .old{color:var(--muted);font-weight:400;font-size:14px}.oos{background:#eee;color:#888;border-radius:10px;padding:9px;font-weight:700}.low{color:#e8590c;font-size:13px}
+.cats{display:flex;overflow-x:auto;gap:10px;padding-bottom:8px;scroll-snap-type:x proximity}
+.cat{flex:0 0 104px;padding:12px 4px;scroll-snap-align:start}.cat span{display:block;line-height:1.25}
+#tabs{display:none}
+#gas{background:var(--tint);border:2px solid var(--brand);border-radius:18px;padding:4px 12px 14px;margin:18px 0}
+#gas .pc{max-width:260px}
 /* Keep the existing desktop layout; adapt controls and columns on phones. */
 body{font-size:16px}
 img,video,iframe,embed,object{max-width:100%}
@@ -125,14 +130,11 @@ img,video{height:auto}
 <h1 data-k="h1"></h1>
 <p data-k="sub"></p>
 <div class="search"><input id="q" data-ph="ph" oninput="setQ(this.value)"><span>🔍</span></div>
-<div class="cats">
-<button class="cat" style="background:var(--y)" onclick="setC('g')" id="cg"><div class="ic">🛒</div><span data-k="c1"></span></button>
-<button class="cat" style="background:var(--b)" onclick="setC('v')" id="cv"><div class="ic">🥬</div><span data-k="c2"></span></button>
-<button class="cat" style="background:var(--g)" onclick="setC('h')" id="ch"><div class="ic">🧴</div><span data-k="c3"></span></button>
-</div>
+<div class="cats" id="cats"></div>
 </div></section>
 
 <main class="wrap">
+<div id="gas" style="display:none"></div>
 <div class="perks">
 <div class="perk"><i>📦</i><span data-k="p1"></span></div>
 <div class="perk"><i>💵</i><span data-k="p2"></span></div>
@@ -204,22 +206,24 @@ function total(){var s=0;P.forEach(function(p){if(cart[p.id])s+=cart[p.id]*ep(p)
 function count(){var s=0;for(var k in cart)s+=cart[k];return s}
 function setQ(v){Q=v.toLowerCase();grid()}
 function setC(c){C=C===c?"all":c;tabs();grid()}
-function tabs(){var t=S[L],h='<button class="tab'+(C==="all"?" on":"")+'" onclick="setC(\'all\')">'+t.all+'</button>';
-[["g","c1"],["v","c2"],["h","c3"]].forEach(function(x){h+='<button class="tab'+(C===x[0]?" on":"")+'" onclick="setC(\''+x[0]+'\')">'+t[x[1]]+'</button>'});
-document.getElementById("tabs").innerHTML=h;
-["g","v","h"].forEach(function(k){document.getElementById("c"+k).classList.toggle("on",C===k)})}
-function grid(){var t=S[L],bn=L==="bn",h="";
+var CT=[["g","🛒","মুদি ও তেল","Grocery & Oil"],["m","🌶️","মসলা","Spices"],["v","🥬","শাক-সবজি","Vegetables"],["n","🍜","নুডুলস ও চা-কফি","Noodles, Tea & Coffee"],["s","🍫","স্ন্যাকস ও মিষ্টি","Snacks & Sweets"],["d","🥤","পানীয়","Drinks"],["c","🧴","প্রসাধনী","Cosmetics"],["h","🧼","ঘর ও পরিষ্কার","Home & Cleaning"],["b","👶","শিশু ও স্বাস্থ্য","Baby & Health"]];
+function tabs(){var bg=["var(--y)","var(--b)","var(--g)"],h='<button class="cat'+(C==="all"?" on":"")+'" style="background:var(--tint)" onclick="setC(\'all\')"><div class="ic">🏪</div><span>'+S[L].all+'</span></button>';
+CT.forEach(function(x,i){h+='<button class="cat'+(C===x[0]?" on":"")+'" style="background:'+bg[i%3]+'" onclick="setC(\''+x[0]+'\')"><div class="ic">'+x[1]+'</div><span>'+x[L==="bn"?2:3]+'</span></button>'});
+document.getElementById("cats").innerHTML=h}
+function card(p){var t=S[L],bn=L==="bn",q=cart[p.id]||0,s=av(p),i=JSON.stringify(String(p.id)).replace(/"/g,"&quot;"),
+old=p.d>0?' <s class="old">'+t.tk+N(p.p)+'</s>':'',img=p.img?'<img class="pi" alt="" src="'+p.img+'">':(p.e||"🛒");
+return '<div class="pc"><div class="em">'+(p.d>0?'<span class="bdg">-'+N(p.d)+'%</span>':'')+img+'</div><div class="nm">'+nm(p)+'</div>'+(p.note?'<div class="note" style="margin:0">'+esc(p.note)+'</div>':'')+'<div class="pr">'+t.tk+N(ep(p))+old+'</div>'+
+(s>0&&s<=5?'<div class="low">'+(bn?"মাত্র "+N(s)+"টি আছে":"Only "+s+" left")+'</div>':'')+
+(s<=0?'<div class="oos">'+(bn?"স্টক নেই":"Out of stock")+'</div>':q?'<div class="step"><button onclick="chg('+i+',-1)">−</button><span>'+N(q)+'</span><button onclick="chg('+i+',1)">+</button></div>':'<button class="add" onclick="chg('+i+',1)">+ '+t.add+'</button>')+'</div>'}
+function grid(){var t=S[L],h="",g="";
 P.forEach(function(p){
 if(p.active===false)return;
+if(p.pin&&!Q&&C==="all"){g+=card(p);return}
 if(C!=="all"&&p.c!==C)return;
 if(Q&&(p.bn+" "+p.en).toLowerCase().indexOf(Q)<0)return;
-var q=cart[p.id]||0,s=av(p),i=JSON.stringify(String(p.id)).replace(/"/g,"&quot;"),
-old=p.d>0?' <s class="old">'+t.tk+N(p.p)+'</s>':'',
-img=p.img?'<img class="pi" alt="" src="'+p.img+'">':(p.e||"🛒");
-h+='<div class="pc"><div class="em">'+(p.d>0?'<span class="bdg">-'+N(p.d)+'%</span>':'')+img+'</div><div class="nm">'+nm(p)+'</div><div class="pr">'+t.tk+N(ep(p))+old+'</div>'+
-(s>0&&s<=5?'<div class="low">'+(bn?"মাত্র "+N(s)+"টি আছে":"Only "+s+" left")+'</div>':'')+
-(s<=0?'<div class="oos">'+(bn?"স্টক নেই":"Out of stock")+'</div>':q?'<div class="step"><button onclick="chg('+i+',-1)">−</button><span>'+N(q)+'</span><button onclick="chg('+i+',1)">+</button></div>':'<button class="add" onclick="chg('+i+',1)">+ '+t.add+'</button>')+'</div>'});
-document.getElementById("grid").innerHTML=h||'<div class="empty">'+t.none+'</div>'}
+h+=card(p)});
+document.getElementById("grid").innerHTML=h||'<div class="empty">'+t.none+'</div>';
+var e=document.getElementById("gas");e.style.display=g?"block":"none";e.innerHTML=g?'<h2 style="margin-top:12px">🔥 '+(L==="bn"?"গ্যাস ও বিশেষ অফার":"Gas & Special Offers")+'</h2><div class="grid">'+g+'</div>':""}
 function chg(id,d){var p=P.filter(function(x){return String(x.id)===String(id)})[0];if(!p)return;var n=(cart[id]||0)+d;if(n>av(p))n=av(p);if(n<=0)delete cart[id];else cart[id]=n;grid();upd();if(document.getElementById("sheet").classList.contains("show"))items()}
 function upd(){saveCart();var t=S[L],c=count();document.getElementById("cnt").textContent=N(c);
 document.getElementById("go").textContent=c?t.view+" · "+t.tk+N(total()):t.shop}
