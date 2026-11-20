@@ -79,8 +79,10 @@ footer a{color:var(--brand2);font-weight:600;text-decoration:none}
 .cats{display:flex;overflow-x:auto;gap:10px;padding-bottom:8px;scroll-snap-type:x proximity}
 .cat{flex:0 0 104px;padding:12px 4px;scroll-snap-align:start}.cat span{display:block;line-height:1.25}
 #tabs{display:none}
-#gas{background:var(--tint);border:2px solid var(--brand);border-radius:18px;padding:4px 12px 14px;margin:18px 0}
-#gas .pc{max-width:260px}
+.layout{display:flex;gap:18px;align-items:flex-start;margin-top:18px}.mainc{flex:1;min-width:0}
+#gas{width:250px;flex:0 0 250px;position:sticky;top:76px;background:var(--tint);border:2px solid var(--brand);border-radius:18px;padding:4px 12px 12px}
+.gh{font-weight:800;font-size:18px;margin:10px 0 8px;color:var(--brand2)}.gl{display:grid;gap:10px}
+@media(max-width:800px){.layout{flex-direction:column}#gas{width:100%;flex:none;position:static;order:-1;padding:2px 10px 10px}.gl{display:flex;overflow-x:auto;gap:10px}.gl .pc{flex:0 0 160px}}
 /* Keep the existing desktop layout; adapt controls and columns on phones. */
 body{font-size:16px}
 img,video,iframe,embed,object{max-width:100%}
@@ -116,34 +118,81 @@ img,video{height:auto}
   .li b{flex-shrink:0}
 }
 @media(max-width:340px){.grid{grid-template-columns:minmax(0,1fr)}}
+
+/* ===== Compact mobile-first look ===== */
+:root{--y:#ffeb95;--b:#8ad3e2;--g:#a1e5a8;--hg1:#e7d5ff;--hg2:#e6d4fe;--brand:#7f4cc2}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--hg1:#2a1f47;--hg2:#2a1f47}}
+:root[data-theme="dark"]{--hg1:#2a1f47;--hg2:#2a1f47}
+html{scroll-padding-top:54px}
+header{background:linear-gradient(var(--hg1),var(--bg));border-bottom:0}
+header .wrap{min-height:48px;padding-top:4px;padding-bottom:4px}
+.logo{font-size:17px}.logo i{width:30px;height:30px;border-radius:9px}
+.btn{font-size:14px;padding:6px 12px}
+.hero{background:none;padding:0}.hbg{background:var(--bg);padding:8px 0 10px}
+.chip{margin-bottom:4px;font-size:14px}
+.hero h1{font-size:22px;margin:0 0 4px}
+.hero p{font-size:14px;margin:0 0 10px}
+.search{max-width:none;box-shadow:none;border-radius:10px;padding:0 12px}
+.search input{font-size:15px;padding:10px 0}
+.hero .cats{background:var(--bg);margin:0 -16px;padding:10px 12px 8px;gap:8px;scroll-padding-left:12px}
+.cat{flex:0 0 78px;padding:8px 2px;border-radius:12px;font-size:12px;font-weight:600}
+.cat .ic{width:40px;height:40px;font-size:22px;margin:0 auto 4px}
+#prod{display:none}
+.layout{margin-top:4px;gap:12px}
+.grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:6px}
+.pc{border:0;background:transparent;padding:0;text-align:left;gap:2px;min-width:0}
+.pc .em{position:relative;display:grid;place-items:center;aspect-ratio:1;font-size:38px;padding:0;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.pi{width:100%;height:100%;object-fit:contain;border-radius:0}
+.pc .pr{color:var(--text);font-size:15px;line-height:1.2}.pc .pr:has(.old){color:#d6336c}
+.old{font-size:12px}
+.pc .nm{font-size:13px;font-weight:500;line-height:1.25;min-height:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pc .note{font-size:11px;line-height:1.2}.low{font-size:11px}
+.bdg{top:3px;left:3px;font-size:10px;padding:1px 5px}
+.em .add{position:absolute;right:4px;bottom:4px;width:30px;height:30px;min-width:0;min-height:0;padding:0;border-radius:50%;background:var(--card);color:var(--brand);border:1.5px solid var(--brand);font-size:20px;line-height:1}
+.em .step{position:absolute;left:4px;right:4px;bottom:4px;height:30px;padding:0;border-radius:15px;font-size:14px}
+.em .step button{width:30px;height:30px;min-width:0;min-height:0;font-size:18px;padding:0}
+.em .oos{position:absolute;left:0;right:0;bottom:0;padding:2px;font-size:11px;border-radius:0;text-align:center;background:rgba(255,255,255,.9)}
+#gas{padding:2px 10px 8px}.gh{font-size:15px;margin:6px 0}
+.perks{gap:8px;margin:14px 0}.perk{padding:8px;border-width:1px;font-size:13px;gap:8px}.perk i{font-size:22px}
+body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+.bar{padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px))}
+.go{font-size:17px;padding:10px}.wa{width:42px;height:42px;font-size:20px}.cartb{font-size:28px}
+@media(max-width:800px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.gl .pc{flex:0 0 108px}}
+@media(max-width:600px){
+ .cat{font-size:12px}.cat .ic{max-width:40px}
+ .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 6px}
+ .pc{padding:0}.perks{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .btn,.tab{font-size:14px}.go{font-size:17px}
+ .em .add{min-width:0;min-height:0}
+}
 </style>
 </head>
 <body>
 <header><div class="wrap">
 <div class="logo"><i>S</i><span>Showrov store</span></div>
 <button class="btn o menu-toggle" id="menu-toggle" aria-controls="header-nav" aria-expanded="false" type="button">☰ <span id="menu-label">মেনু</span></button>
-<nav class="hr" id="header-nav" aria-label="Account and language"><button class="btn o" id="lang"></button><button class="btn p" id="lg" onclick="openAcc()"></button></nav>
+<nav class="hr" id="header-nav" aria-label="Account and language"><button class="btn o" id="mo" onclick="openAcc(L==='bn'?'অর্ডার দেখতে লগইন করুন':'Login to see your orders')"></button><button class="btn o" id="lang"></button><button class="btn p" id="lg" onclick="openAcc()"></button></nav>
 </div></header>
 
-<section class="hero"><div class="wrap">
+<section class="hero"><div class="hbg"><div class="wrap">
 <div class="chip">📍 <span data-k="loc"></span></div>
 <h1 data-k="h1"></h1>
 <p data-k="sub"></p>
 <div class="search"><input id="q" data-ph="ph" oninput="setQ(this.value)"><span>🔍</span></div>
-<div class="cats" id="cats"></div>
-</div></section>
+</div></div><div class="wrap"><div class="cats" id="cats"></div></div></section>
 
 <main class="wrap">
-<div id="gas" style="display:none"></div>
+<div class="layout"><div class="mainc">
+<h2 id="prod" data-k="pop"></h2>
+<div class="tabs" id="tabs"></div>
+<div class="grid" id="grid"></div></div>
+<aside id="gas" style="display:none"></aside></div>
 <div class="perks">
 <div class="perk"><i>📦</i><span data-k="p1"></span></div>
 <div class="perk"><i>💵</i><span data-k="p2"></span></div>
 <div class="perk"><i>🛵</i><span data-k="p3"></span></div>
 <div class="perk"><i>🏷️</i><span data-k="p4"></span></div>
 </div>
-<h2 id="prod" data-k="pop"></h2>
-<div class="tabs" id="tabs"></div>
-<div class="grid" id="grid"></div>
 <footer><b>Showrov store</b><br><span data-k="loc2"></span><br><a href="tel:+8801771671269">📞 01771671269</a> · <a href="https://wa.me/8801771671269" target="_blank" rel="noopener">💬 WhatsApp</a><br><small>© 2026 Showrov store</small></footer>
 </main>
 
@@ -204,26 +253,28 @@ function av(p){return p.stock==null||p.stock===""?1e9:Number(p.stock)}
 function clean(){for(var k in cart){var p=P.filter(function(x){return String(x.id)===String(k)})[0];if(!p||!(cart[k]>0)||av(p)<=0||p.active===false)delete cart[k];else if(cart[k]>av(p))cart[k]=av(p)}}
 function total(){var s=0;P.forEach(function(p){if(cart[p.id])s+=cart[p.id]*ep(p)});return s}
 function count(){var s=0;for(var k in cart)s+=cart[k];return s}
-function setQ(v){Q=v.toLowerCase();grid()}
-function setC(c){C=C===c?"all":c;tabs();grid()}
+var KW=[["চাল","rice chal"],["ডাল","dal daal lentil"],["মসুর","masoor moshur"],["মুগ","moong mug"],["আটা","atta ata flour"],["ময়দা","maida moyda flour"],["চিনি","sugar chini"],["লবণ","salt lobon noon"],["তেল","oil tel"],["সয়াবিন","soybean soyabin"],["সরিষা","mustard shorisha"],["পাম","palm"],["ডিম","egg dim"],["সেমাই","semai vermicelli"],["দুধ","milk dudh"],["মুড়ি","muri puffed rice"],["হলুদ","turmeric holud"],["মরিচ","chili chilli morich"],["জিরা","cumin jira"],["ধনে","coriander dhone"],["মসলা","masala spice moshla"],["সস","sauce"],["এলাচ","cardamom elach"],["আলু","potato alu"],["পেঁয়াজ","onion peyaj"],["রসুন","garlic roshun"],["আদা","ginger ada"],["টমেটো","tomato"],["নুডুলস","noodles"],["চা","tea cha"],["কফি","coffee"],["হরলিক্স","horlicks"],["চকলেট","chocolate chocolet"],["ললিপপ","lollipop"],["চুইংগাম","chewing gum chuingum"],["বিস্কুট","biscuit"],["চানাচুর","chanachur"],["চিপস","chips"],["আইসক্রিম","ice cream icecream"],["কোকা","coca cola coke"],["সেভেন","seven up 7up"],["স্প্রাইট","sprite"],["জুস","juice"],["স্যালাইন","saline"],["সাবান","soap sabon"],["শ্যাম্পু","shampoo"],["কন্ডিশনার","conditioner"],["পেস্ট","toothpaste paste"],["ব্রাশ","brush"],["পাউডার","powder"],["লোশন","lotion"],["ক্রিম","cream"],["রেজার","razor"],["ডিটারজেন্ট","detergent"],["কয়েল","coil mosquito"],["টিস্যু","tissue"],["মোমবাতি","candle"],["আগরবাতি","incense agarbati"],["লাইটার","lighter"],["গ্যাস","gas cylinder"],["ল্যাকটোজেন","lactogen baby"],["সেরেলাক","cerelac baby"],["প্যাম্পার","pampers diaper"],["ইসবগুল","isabgol"],["হজমি","hojmi"],["নাড়ু","naru"],["ওয়েফার","wafer"],["কনডেন্স","condensed"],["স্যাভলন","savlon"],["লাক্স","lux"],["লাইফবয়","lifebuoy"],["রিন","rin"],["সার্ফ","surf excel"],["ভিম","vim"],["ম্যাগি","maggi"],["ভ্যাসলিন","vaseline"],["প্যারাসুট","parachute"],["কোলগেট","colgate"],["পেপসোডেন্ট","pepsodent"],["কেজি","kg"],["লিটার","litre liter"],["গ্রাম","gram"]];
+function kw(p){if(p._k)return p._k;var b=" "+(p.bn||"").replace(/[()]/g," ")+" ",t=(p.bn||"")+" "+(p.en||"");KW.forEach(function(x){if(x[0].length<=2?b.indexOf(" "+x[0]+" ")>=0:b.indexOf(x[0])>=0)t+=" "+x[1]});p._k=t.toLowerCase();return p._k}
+function hit(p){var k=kw(p);return Q.split(/\s+/).every(function(w){return k.indexOf(w)>=0})}
+function setQ(v){Q=v.toLowerCase().trim();grid()}
+function setC(c){C=C===c?"all":c;tabs();grid();setTimeout(function(){var e=document.getElementById("cats");if(e)window.scrollTo({top:e.getBoundingClientRect().top+window.scrollY-52,behavior:"smooth"})},30)}
 var CT=[["g","🛒","মুদি ও তেল","Grocery & Oil"],["m","🌶️","মসলা","Spices"],["v","🥬","শাক-সবজি","Vegetables"],["n","🍜","নুডুলস ও চা-কফি","Noodles, Tea & Coffee"],["s","🍫","স্ন্যাকস ও মিষ্টি","Snacks & Sweets"],["d","🥤","পানীয়","Drinks"],["c","🧴","প্রসাধনী","Cosmetics"],["h","🧼","ঘর ও পরিষ্কার","Home & Cleaning"],["b","👶","শিশু ও স্বাস্থ্য","Baby & Health"]];
 function tabs(){var bg=["var(--y)","var(--b)","var(--g)"],h='<button class="cat'+(C==="all"?" on":"")+'" style="background:var(--tint)" onclick="setC(\'all\')"><div class="ic">🏪</div><span>'+S[L].all+'</span></button>';
 CT.forEach(function(x,i){h+='<button class="cat'+(C===x[0]?" on":"")+'" style="background:'+bg[i%3]+'" onclick="setC(\''+x[0]+'\')"><div class="ic">'+x[1]+'</div><span>'+x[L==="bn"?2:3]+'</span></button>'});
 document.getElementById("cats").innerHTML=h}
 function card(p){var t=S[L],bn=L==="bn",q=cart[p.id]||0,s=av(p),i=JSON.stringify(String(p.id)).replace(/"/g,"&quot;"),
-old=p.d>0?' <s class="old">'+t.tk+N(p.p)+'</s>':'',img=p.img?'<img class="pi" alt="" src="'+p.img+'">':(p.e||"🛒");
-return '<div class="pc"><div class="em">'+(p.d>0?'<span class="bdg">-'+N(p.d)+'%</span>':'')+img+'</div><div class="nm">'+nm(p)+'</div>'+(p.note?'<div class="note" style="margin:0">'+esc(p.note)+'</div>':'')+'<div class="pr">'+t.tk+N(ep(p))+old+'</div>'+
-(s>0&&s<=5?'<div class="low">'+(bn?"মাত্র "+N(s)+"টি আছে":"Only "+s+" left")+'</div>':'')+
-(s<=0?'<div class="oos">'+(bn?"স্টক নেই":"Out of stock")+'</div>':q?'<div class="step"><button onclick="chg('+i+',-1)">−</button><span>'+N(q)+'</span><button onclick="chg('+i+',1)">+</button></div>':'<button class="add" onclick="chg('+i+',1)">+ '+t.add+'</button>')+'</div>'}
+old=p.d>0?' <s class="old">'+t.tk+N(p.p)+'</s>':'',img=p.img?'<img class="pi" alt="" src="'+p.img+'">':(p.e||"🛒"),
+ctl=s<=0?'<div class="oos">'+(bn?"স্টক নেই":"Out of stock")+'</div>':q?'<div class="step"><button onclick="chg('+i+',-1)">−</button><span>'+N(q)+'</span><button onclick="chg('+i+',1)">+</button></div>':'<button class="add" aria-label="add" onclick="chg('+i+',1)">+</button>';
+return '<div class="pc"><div class="em">'+(p.d>0?'<span class="bdg">-'+N(p.d)+'%</span>':'')+img+ctl+'</div><div class="pr">'+t.tk+N(ep(p))+old+'</div><div class="nm">'+nm(p)+'</div>'+(p.note?'<div class="note">'+esc(p.note)+'</div>':'')+(s>0&&s<=5?'<div class="low">'+(bn?"মাত্র "+N(s)+"টি":"Only "+s+" left")+'</div>':'')+'</div>'}
 function grid(){var t=S[L],h="",g="";
 P.forEach(function(p){
 if(p.active===false)return;
 if(p.pin&&!Q&&C==="all"){g+=card(p);return}
 if(C!=="all"&&p.c!==C)return;
-if(Q&&(p.bn+" "+p.en).toLowerCase().indexOf(Q)<0)return;
+if(Q&&!hit(p))return;
 h+=card(p)});
 document.getElementById("grid").innerHTML=h||'<div class="empty">'+t.none+'</div>';
-var e=document.getElementById("gas");e.style.display=g?"block":"none";e.innerHTML=g?'<h2 style="margin-top:12px">🔥 '+(L==="bn"?"গ্যাস ও বিশেষ অফার":"Gas & Special Offers")+'</h2><div class="grid">'+g+'</div>':""}
+var e=document.getElementById("gas");e.style.display=g?"block":"none";e.innerHTML=g?'<div class="gh">🔥 '+(L==="bn"?"গ্যাস ও বিশেষ অফার":"Gas & Special Offers")+'</div><div class="gl">'+g+'</div>':""}
 function chg(id,d){var p=P.filter(function(x){return String(x.id)===String(id)})[0];if(!p)return;var n=(cart[id]||0)+d;if(n>av(p))n=av(p);if(n<=0)delete cart[id];else cart[id]=n;grid();upd();if(document.getElementById("sheet").classList.contains("show"))items()}
 function upd(){saveCart();var t=S[L],c=count();document.getElementById("cnt").textContent=N(c);
 document.getElementById("go").textContent=c?t.view+" · "+t.tk+N(total()):t.shop}
@@ -279,7 +330,7 @@ function cp(){var b=document.getElementById("cpb");function ok(){b.textContent=L
 function fb(){var x=document.createElement("textarea");x.value=OM;document.body.appendChild(x);x.select();try{document.execCommand("copy");ok()}catch(e){}document.body.removeChild(x)}
 try{navigator.clipboard.writeText(OM).then(ok,fb)}catch(e){fb()}}
 function render(){var t=S[L];
-document.getElementById("menu-label").textContent=L==="bn"?"মেনু":"Menu";
+document.getElementById("menu-label").textContent=L==="bn"?"মেনু":"Menu";document.getElementById("mo").textContent=L==="bn"?"📦 আমার অর্ডার":"📦 My orders";
 document.querySelectorAll("[data-k]").forEach(function(e){e.innerHTML=t[e.dataset.k]});
 document.querySelectorAll("[data-ph]").forEach(function(e){e.placeholder=t[e.dataset.ph]});
 document.getElementById("lang").textContent=t.btn;document.documentElement.lang=L;
@@ -291,7 +342,7 @@ render();
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import{getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,updateProfile,signOut}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import{getFirestore,doc,getDoc,setDoc,addDoc,collection,query,where,getDocs,onSnapshot,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import{getFirestore,doc,getDoc,setDoc,addDoc,collection,query,where,getDocs,onSnapshot,updateDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const app=initializeApp({apiKey:"AIzaSyCKK3M-58_-ivMk2Z-gW7mMDRQf_sAIBJs",authDomain:"showrov-store-4c0da.firebaseapp.com",projectId:"showrov-store-4c0da",appId:"1:264853187583:web:bbc27d496a4c45fb3195ca"});
 const auth=getAuth(app),db=getFirestore(app);
 let FU=null;
@@ -311,13 +362,26 @@ if(c==="auth/unauthorized-domain")return b?"এই ডোমেইন Firebase-�
 return(b?"সমস্যা হয়েছে: ":"Error: ")+c}
 window.openAcc=async function(msg){const b=bn();let h;
 if(FU){let rows="";
-try{const s=await getDocs(query(collection(db,"orders"),where("uid","==",FU.uid)));const a=[];s.forEach(d=>a.push(d.data()));
+try{const s=await getDocs(query(collection(db,"orders"),where("uid","==",FU.uid)));const a=[];s.forEach(d=>a.push({...d.data(),id:d.id}));
 a.sort((x,y)=>(y.createdAt?.seconds||0)-(x.createdAt?.seconds||0));
-a.forEach(o=>{rows+=`<div class="li"><span>${esc(o.no)} · ${(ST[o.status]||[o.status,o.status])[b?0:1]}</span><b>৳${N(o.total)}</b></div>`})}catch(e){}
+a.forEach(o=>{const d=o.createdAt?o.createdAt.toDate().toLocaleString(b?"bn-BD":"en-GB",{dateStyle:"medium",timeStyle:"short"}):"",it=(o.items||[]).map(i=>esc(b?(i.bn||i.name):(i.name||i.bn))+" × "+N(i.qty)).join(", ");
+MYO[o.id]=o;const left=Math.ceil((1800000-(o.createdAt?Date.now()-o.createdAt.toMillis():0))/60000),can=o.status==="new"&&left>0,
+btns=`<div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap"><button class="add" style="padding:6px 12px" onclick="reorder('${o.id}')">🔁 ${b?"আবার অর্ডার করুন":"Order again"}</button>${can?`<button class="add" style="padding:6px 12px;color:#d6336c;border-color:#d6336c" onclick="cancelOrder('${o.id}')">❌ ${b?"বাতিল করুন ("+N(Math.min(left,30))+" মিনিট বাকি)":"Cancel ("+Math.min(left,30)+" min left)"}</button>`:""}</div>`;
+rows+=`<div class="li" style="display:block"><div style="display:flex;justify-content:space-between;gap:8px"><span>${esc(o.no)} · ${(ST[o.status]||[o.status,o.status])[b?0:1]}</span><b>৳${N(o.total)}</b></div><div class="note" style="margin:2px 0">${esc(d)}</div><div class="note" style="margin:0">${it}</div>${btns}</div>`})}catch(e){}
 h=`<h3>👤 ${esc(FU.name)}</h3><p class="note">📞 ${esc(FU.phone)}</p><b>${b?"আমার অর্ডার":"My orders"}</b>${rows||`<div class="empty">${b?"এখনো কোনো অর্ডার নেই":"No orders yet"}</div>`}<button class="add" style="width:100%;margin-top:12px" onclick="logout()">${b?"লগআউট":"Log out"}</button>`}
 else{const r=AT==="r",i=(id,x,ph)=>`<input id="${id}" ${x} placeholder="${ph}">`;
 h=`<h3>${b?"স্বাগতম":"Welcome"}</h3><div class="tabs" style="justify-content:flex-start"><button class="tab${r?"":" on"}" onclick="setAT('l')">${b?"লগইন":"Login"}</button><button class="tab${r?" on":""}" onclick="setAT('r')">${b?"নতুন অ্যাকাউন্ট":"Register"}</button></div><p class="note" style="margin-top:10px">${msg||(r?(b?"নাম, ফোন নম্বর, পাসওয়ার্ড ও ঠিকানা দিয়ে অ্যাকাউন্ট খুলুন।":"Enter name, phone, password and address."):(b?"ফোন নম্বর ও পাসওয়ার্ড দিয়ে লগইন করুন।":"Login with phone and password."))}</p>${r?i("un","",b?"আপনার নাম":"Your name"):""}${i("up",'inputmode="tel"',b?"ফোন নম্বর (01XXXXXXXXX)":"Phone (01XXXXXXXXX)")}${i("pw",'type="password"',b?"পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)":"Password (6+ characters)")}${r?`<textarea id="ua" rows="2" placeholder="${b?"ঠিকানা":"Address"}"></textarea>`:""}<p class="err" id="ue"></p>`+(r?`<button class="go" style="width:100%" onclick="doReg()">${b?"অ্যাকাউন্ট খুলুন":"Create account"}</button>`:`<button class="go" style="width:100%" onclick="doLogin()">${b?"লগইন":"Login"}</button><p class="note" style="margin-top:10px;text-align:center">${b?"পাসওয়ার্ড ভুলে গেছেন? ":"Forgot password? "}<a href="tel:+8801771671269" style="color:var(--brand2)">${b?"দোকানে কল করুন":"Call the shop"}</a></p>`)}
 $("acc").innerHTML='<button class="x" onclick="closeCart()" aria-label="Close">✕</button>'+h;$("ov").style.display="block";$("acc").classList.add("show")};
+const MYO=window.MYO={};
+window.reorder=function(id){const o=MYO[id];if(!o)return;const b=bn(),miss=[];
+(o.items||[]).forEach(i=>{const p=window.P.find(x=>String(x.id)===String(i.id))||window.P.find(x=>x.bn&&x.bn===i.bn)||window.P.find(x=>x.en&&x.en===i.name);
+if(!p||p.active===false||av(p)<=0){miss.push(i.bn||i.name);return}
+cart[p.id]=Math.min((cart[p.id]||0)+(Number(i.qty)||1),av(p))});
+grid();upd();closeCart();openCart();
+if(miss.length)setTimeout(()=>alert((b?"এই পণ্যগুলো এখন নেই: ":"Currently unavailable: ")+miss.join(", ")),200)};
+window.cancelOrder=async function(id){const b=bn();if(!confirm(b?"এই অর্ডারটি বাতিল করবেন?":"Cancel this order?"))return;
+try{await updateDoc(doc(db,"orders",id),{status:"cancelled"})}catch(e){alert(b?"বাতিল করা গেল না। ৩০ মিনিট পার হয়ে গেছে বা দোকান অর্ডার নিশ্চিত করেছে। দয়া করে দোকানে কল করুন।":"Could not cancel: the 30-minute window has passed or the shop has confirmed it. Please call the shop.")}
+openAcc()};
 function vals(){const g=i=>$(i)?$(i).value:"";return{n:g("un").trim(),p:g("up").replace(/\s/g,""),w:g("pw"),a:g("ua").trim()}}
 function bad(v,needName){const b=bn();if(!/^01\d{9}$/.test(v.p))return b?"সঠিক ফোন নম্বর দিন (01XXXXXXXXX)":"Enter a valid phone (01XXXXXXXXX)";if(v.w.length<6)return b?"পাসওয়ার্ড কমপক্ষে ৬ অক্ষর দিন":"Password needs 6+ characters";if(needName&&(!v.n||!v.a))return b?"নাম ও ঠিকানা দিন":"Enter name and address";return""}
 window.doLogin=async function(){const v=vals(),m=bad(v,false);if(m){$("ue").textContent=m;return}
